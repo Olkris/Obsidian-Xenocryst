@@ -1,0 +1,820 @@
+filters:
+  and:
+    - file.ext.containsAny("md", "canvas")
+    - |-
+      !file.path.startsWith(
+      file("Thing.base").folder
+      )
+formulas:
+  FilterUpcoming: |-
+    ["Comment: Returns true for things that have any of their dates happening in the future. For Origin and Expiry, also returns true if on the same day, while for Engaged and Concluded it doesn't, since otherwise the table would get flooded with today's events every single time and become useless.",
+
+
+    [
+
+    formula.Variables
+
+    ].map(
+
+
+    ( (0)
+    || 
+    today() <= file
+    .properties[value[0][6]]
+    || 
+    today() <= file
+    .properties[value[0][5]]
+    || 
+    today() < file
+    .properties[value[0][3]]
+    ||
+    if(
+    date(formula.DateMain)
+    < today()
+    &&
+    !file
+    .properties[value[0][5]]
+    .isEmpty(),
+    if(
+    file
+    .properties[value[0][0]]
+    .contains(
+    link(value[1][2][0])
+    ),
+    today() 
+    <= formula.DateAnniversaries,
+    today()
+    == formula.DateAnniversaries
+    )
+    )
+    )
+
+    &&
+
+    !( (0)
+    || 
+    file
+    .properties[value[0][4]]
+    < today()
+    )
+
+
+    )[0]
+
+    ][1]
+  Thumbnail: |-
+    [[
+
+    formula.Variables
+
+    ]].map([
+
+    if(
+    file
+    .properties[value[0][0][13]]
+    .isType("Link"),
+    image(
+    file
+    .properties[value[0][0][13]]
+    )
+    ,
+    file
+    .properties[value[0][0][13]])
+
+    ])[0][0]
+  DateMain: |-
+    ["Comment: Picks one of the dates among the filled out date properties by order of relevance / priority. That is to say, from most relevant to least relevant: Expiry > Origin > Engaged > Concluded.",
+
+    [
+
+    formula.Variables
+
+    ].map(
+
+    if(
+    !file.properties[value[0][6]]
+    .isEmpty(),
+    file.properties[value[0][6]]
+    ,if(
+    !file.properties[value[0][5]]
+    .isEmpty(),
+    file.properties[value[0][5]]
+    ,if(
+    !file.properties[value[0][3]]
+    .isEmpty(),
+    file.properties[value[0][3]]
+    ,if(
+    !file.properties[value[0][4]]
+    .isEmpty(),
+    file.properties[value[0][4]]
+    ))))
+    .format("YYYY-MM-DD")
+
+
+    )[0]
+
+    ][1]
+  DateRelative: |-
+    ["Comment: anniversaries for entities are treated like other upcoming events, and relative date counts down to the next anniversary. However, anniversaries for non-entities are only shown on the very day of the anniversary, so instead of a useless countdown, the relative date instead shows the age of the thing.",
+
+
+    [
+
+    formula.Variables
+
+    ].map(
+
+    date(
+    if(
+    file
+    .properties[value[0][0]]
+    .contains(
+    link(value[1][2][0])
+    ), 
+    formula.DateAnniversaries,
+    formula.DateMain
+    )
+    )
+    - today()
+
+    ).map(
+
+    if(
+    value.toString()
+    == "a few seconds",
+    "TODAY!",
+    value
+    )
+
+    )[0]
+
+    ][1]
+  DateAnniversaries: |-
+    if(
+    "Comment: if main date is already in the past, replace with anniversary date if possible.",
+
+    [
+
+    formula.Variables
+
+    ].map(
+
+    if(
+    date(formula.DateMain)
+    < today()
+    &&
+    !file
+    .properties[value[0][5]]
+    .isEmpty(),
+
+    [
+    file
+    .properties[value[0][5]]
+    ].map(
+    today().year
+    + value.format("-MM-DD")
+    )[0]
+
+    ,formula.DateMain
+    )
+
+    )[0]
+
+    )
+  ContainedDates: |-
+    if(
+    formula.VariablesDate[1][1]
+    .isEmpty(),
+    null
+    ,
+
+    [[
+
+    formula.VariablesDate
+
+    ]].map([ value[0],
+
+
+    if(
+    /^(Day|Week|Month)$/
+    .matches(value[0][1][1]),
+    null
+    ,if(
+    /^(Year)$/
+    .matches(value[0][1][1]),
+    file.basename
+    ))
+
+    ]).map([ value[0],
+
+    if(
+    value[1] == null,
+    if(
+    /^(Day|Week)$/
+    .matches(value[0][1][1]),
+    null
+    ,if(
+    /^(Month)$/
+    .matches(value[0][1][1]),
+    file.basename
+    ))
+    , 
+    ["01","02","03","04",
+     "05","06","07","08",
+     "09","10","11","12"]
+    .reduce(
+    [acc[0]+
+     
+    [acc[1]+"-"+value]
+
+    ,acc[1]]
+    ,[[], value[1]]
+    )[0]
+
+    )
+
+    ]).map([ value[0],
+
+    if(
+    value[1] == null,
+    if(
+    /^(Day)$/
+    .matches(value[0][1][1]),
+    null
+    ,if(
+    /^(Week)$/
+    .matches(value[0][1][1]),
+    file.basename
+    ))
+    ,
+    list(value[1]).flat()
+    .map(
+    date(value+"-01")
+    ).map(
+    [value,value,value,value,
+     value,value,value,value]
+    .map(
+    [
+    value,
+    value
+    - (value.format("e")+"d")
+    + (index+"w")
+    + "3d"
+    ]
+    ).filter(
+    date(value[0])
+    .format("YYYY-MM")
+    == date(value[1])
+    .format("YYYY-MM")
+    ).map(
+    date(value[1])
+    .format("YYYY-WW")
+    .replace("-", "-W")
+    )
+    )
+
+    )
+
+    ]).map([ value[0],
+
+    if(
+    value[1] == null,
+    if(
+    /^(Day)$/
+    .matches(value[0][1][1]),
+    file.basename
+    )
+    ,
+    list(value[1]).flat()
+    .map(
+    [
+    date(value.slice(0,4)+"-01-01")
+    ].map(
+    [
+    value,
+    value - (value.format("e")+"d")
+    ]
+    ).map(
+    if(
+    value[1].format("gggg") 
+    == value[0].format("YYYY"),
+    value[1],
+    value[1]+"1w"
+    )
+    )[0]
+    +
+    (
+    (number(value.slice(6,8))-1)
+    +"w")
+
+    ).map(
+
+    [value,value,value,value,
+     value,value,value]
+    .map(
+    value + (index+"d")
+    )
+    )
+    )
+
+    ])[0][1]
+
+    )
+  Checkbox: |
+    
+    [[
+
+    formula.Variables
+
+    ]].map([ value[0],
+
+    if( 
+    formula.ContainedDates
+    .isEmpty(),
+
+    file.asLink(),
+
+
+    link(value[0][1][0][1])
+    .asFile().links
+    .filter(
+    list(formula.ContainedDates)
+    .flat().containsAny(
+    value.asFile()
+    .properties[formula.
+    Variables[0][3]]
+    )
+    && 
+    !value.asFile()
+    .properties[formula.
+    Variables[0][3]]
+    .isEmpty()
+    )
+    )
+
+    ]).map([ value[0],
+
+    list(value[1]).map(
+    !value.asFile()
+    .properties[
+    formula.Variables[0][8]
+    ]
+    .isEmpty()
+    )
+
+    ]).map([ value[0],
+
+    !value[1].contains(false)
+
+    ])[0][1]
+  SpannedToday: |-
+    [
+
+    formula.Variables
+    +
+    formula.VariablesDate
+
+    ].map(
+
+    file.properties[value[0][3]] 
+    <= value[2][2]
+    && 
+    file.properties[value[0][4]] 
+    >= value[2][2]
+    && 
+    value[2][1] == "Day"
+
+    )[0]
+  SmartLink: |+
+    
+    if(
+    formula.SpannedToday,
+
+    link(
+    "[["
+    + file.basename 
+    + "#" 
+    + this.file.basename
+    + "]]"
+    )
+
+    , file
+    )
+
+  FilterRecent: |-
+    [
+
+    formula.Variables
+
+    ].map(
+
+    file
+    .properties[value[0][5]] 
+    <= today()
+    ||
+    file
+    .properties[value[0][3]] 
+    <= today()
+
+    )[0]
+  AutofillDiscusses: |-
+    [
+
+    formula.VariablesDate
+
+    ].map(
+
+    if(
+    date(value[0][2])
+    .isEmpty(),
+    link(this.file.basename)
+    )
+
+    )[0]
+  AutofillDate: |-
+    [
+
+    formula.VariablesDate
+
+    ].map(
+
+    if(
+    value[0][1] == "Day",
+    value[0][2]
+    )
+
+    )[0]
+  Backlinks: |
+    
+    file.backlinks
+    .filter(
+    value.asFile()
+    .properties[
+    formula.Variables[0][9]
+    ]
+    .contains(
+    file.name
+    )
+    ||
+    value.asFile()
+    .properties[
+    formula.Variables[0][0]
+    ]
+    .contains(
+    file.name
+    )
+    )
+    .length
+  Relevance: |+
+    (
+
+
+    ( 1 + 
+    if(QuickResume,0.5,0) +
+    if(Time,Time,0)
+    /
+    (if(Time,Time.abs(),0) +30)
+    )
+
+    *
+
+    ( 1 +
+    if(Money,Money.abs(),0)
+    /
+    (if(Money,Money.abs(),0) +20)
+    )
+
+    *
+
+    ( 
+    formula.Backlinks
+    /
+    (formula.Backlinks.abs() +10)
+    )
+
+    )
+
+  FilterMoment: |-
+    [
+
+    formula.Variables
+
+    ].map(
+
+    if(
+    file
+    .properties[value[0][9]]
+    .contains(this),
+    true,
+
+    [
+
+    value
+    +
+    formula.VariablesDate
+
+    ].map(
+
+    if(
+    value[2][1] == "Day",
+    if(
+    !file
+    .properties[value[0][4]]
+    .isEmpty(),
+    formula.SpannedToday
+    ,
+    file 
+    .properties[value[0][3]] 
+    == date(this.file.basename)
+    )
+
+    ,if(
+    value[2][1] == "Week"
+    &&
+    value[3][1] == "Day", 
+    (
+    value[3][2]
+    - 
+    (value[3][2].format("e")+"d")
+    )
+    == 
+    value[2][2]
+
+    ,if(
+    value[2][1] == "Month" 
+    && 
+    value[3][1] == "Week",
+    value[2][2]
+    .format("YYYY-MM")
+    == 
+    date(value[3][2]+"3d")
+    .format("YYYY-MM")
+
+
+    ,if(
+    value[2][1] == "Year"
+    &&
+    value[3][1] == "Month",
+    value[2][2].format("YYYY")
+    == 
+    value[3][2].format("YYYY")
+
+    ,if(
+    this.file 
+    == file(link(value[1][0][0]))
+    && value[3][1] 
+    == "Year",
+    true
+
+    )))))
+
+    )[0]
+
+    )
+
+    )[0]
+  Variables: |
+    [[
+
+    file("Xenocryst config v2")
+    .properties
+
+    ]].map([
+
+    [
+    value[0].keys(),
+    value[0].values()
+    ]
+
+    ])[0][0]
+  FilterHeatmap: |-
+    [
+
+    formula.VariablesDate
+
+    ].map(
+
+    value[1][2].isEmpty()
+
+    )[0]
+  VariablesDate: |-
+    [
+
+    [
+    [this.file.basename],
+    [file.basename]
+    ]
+
+    ].map(
+
+    value.map(
+
+    value
+    +
+    if( /^\d{4}-\d{2}-\d{2}$/
+    .matches(value[0]), ["Day"]
+    ,if( /^\d{4}-\d{2}$/
+    .matches(value[0]), ["Month"]
+    ,if( /^\d{4}$/
+    .matches(value[0]), ["Year"]
+    ,if( /^\d{4}-W\d{2}$/ .matches(value[0]), ["Week"]
+    ,
+    []
+    ))))
+    )
+
+    ).map(
+
+    value.map(
+
+    value
+    +
+    if( value[1] == "Day",
+    [date(value[0])]
+    ,if( value[1] == "Month",
+    [date(value[0]+"-01")]
+    ,if( value[1] == "Year",
+    [date(value[0]+"-01-01")]
+    ,if( value[1] == "Week",
+    [
+    [
+    date(value[0].slice(0,4)+"-01-01")
+    ].map(
+    [
+    value,
+    value - (value.format("e")+"d")
+    ]
+    ).map(
+    if(
+    value[1].format("gggg") 
+    == value[0].format("YYYY"),
+    value[1],
+    value[1]+"1w"
+    )
+    )[0]
+    +
+    (
+    (number(value[0].slice(6,8))-1)
+    +"w")
+    ]
+    ))))
+
+    )
+
+    )[0]
+properties:
+  note.Money:
+    displayName: 💵
+  formula.Checkbox:
+    displayName: ✅
+  formula.Thumbnail:
+    displayName: 🖼️
+  note.Attraction:
+    displayName: 📊
+  formula.Backlinks:
+    displayName: 🔗
+  formula.Relevance:
+    displayName: Relevance
+  note.QuickResume:
+    displayName: 🧲
+  formula.DateRelative:
+    displayName: ⌛
+views:
+  - type: table
+    name: 🔛 Notes on this day or about this topic
+    filters:
+      or:
+        - and:
+            - Engaged == formula.AutofillDate
+            - "!Engaged.isEmpty()"
+        - and:
+            - Discusses.contains(formula.AutofillDiscusses)
+            - (!Discusses.contains(null))
+        - formula.FilterMoment == true
+        - formula.SpannedToday == true
+    order:
+      - formula.Thumbnail
+      - formula.Checkbox
+      - formula.SmartLink
+      - Engaged
+    sort:
+      - property: formula.SpannedToday
+        direction: DESC
+      - property: formula.VariablesDate
+        direction: ASC
+      - property: Engaged
+        direction: ASC
+      - property: file.ctime
+        direction: ASC
+    columnSize:
+      formula.Thumbnail: 51
+      formula.Checkbox: -18
+      formula.SmartLink: 416
+      note.Engaged: 133
+    dateProperty: note.Engaged
+    startDate: 2025-10-01
+    endDate: 2026-05-01
+    trackProperty: formula.Checkbox
+  - type: table
+    name: 🔜 Upcoming + anniversaries
+    filters:
+      or:
+        - formula.FilterUpcoming == true
+    order:
+      - formula.Thumbnail
+      - file.name
+      - formula.DateRelative
+      - formula.DateMain
+      - Money
+      - Reality
+    sort:
+      - property: formula.DateAnniversaries
+        direction: ASC
+    limit: 5
+    rowHeight: medium
+    columnSize:
+      formula.Thumbnail: 51
+      file.name: 179
+      formula.DateRelative: 64
+      note.Money: 69
+      note.Reality: 149
+  - type: table
+    name: 🔙 Recent overview
+    filters:
+      and:
+        - formula.FilterRecent == true
+    groupBy:
+      property: formula.DateMain
+      direction: DESC
+    order:
+      - formula.Checkbox
+      - formula.Thumbnail
+      - file.name
+      - Attraction
+      - Reality
+    sort:
+      - property: formula.DateMain
+        direction: DESC
+      - property: file.ctime
+        direction: DESC
+    limit: 30
+    columnSize:
+      formula.Checkbox: -116
+      formula.Thumbnail: 51
+      file.name: 487
+      note.Attraction: 47
+  - type: table
+    name: 🔝 Heatmap
+    filters:
+      and:
+        - not:
+            - Quest == "Done"
+            - formula.Backlinks.isEmpty()
+    groupBy:
+      property: Attraction
+      direction: DESC
+    order:
+      - formula.Thumbnail
+      - file.name
+      - QuickResume
+      - formula.Backlinks
+      - Time
+      - Money
+      - Quest
+      - Attraction
+      - Factors
+    sort:
+      - property: formula.Relevance
+        direction: DESC
+    limit: 100
+    columnSize:
+      formula.Thumbnail: 51
+      file.name: 310
+      note.Time: 60
+      note.Money: 69
+      note.Attraction: 47
+  - type: table
+    name: 🔚 Missed notes
+    filters:
+      or:
+        - |-
+          /^[Uu][Nn][Tt][Ii][Tt][Ll][Ee][Dd]/
+          .matches(file.basename)
+        - and:
+            - and:
+                - and:
+                    - Discusses.isEmpty()
+                    - Engaged.isEmpty()
+                - and:
+                    - Collections.isEmpty()
+            - not:
+                - formula.ContainedDates
+    order:
+      - file.name
+      - file.ctime
+    sort:
+      - property: file.ctime
+        direction: DESC
+    limit: 20
+    columnSize:
+      file.name: 360

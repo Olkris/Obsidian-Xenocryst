@@ -1,0 +1,816 @@
+summaries:
+  Unique: values.unique().length
+filters:
+  and:
+    - or:
+        - formula.FilterThing == true
+        - and:
+            - |-
+              this.file
+              .properties["Query"]
+            - |-
+              list(
+              Collections
+              ).contains(
+              formula.AutofillCollection
+              )
+            - |-
+              list(
+              file.properties[
+              this.file
+              .properties["Query"]
+              ]
+              ).contains(
+              this.file
+              .properties["Collections"]
+              )
+        - and:
+            - |-
+              this.file
+              .properties["Query"]
+              .isEmpty()
+            - |-
+              list(
+              Collections
+              ).contains(
+              formula.AutofillCollection
+              )
+    - formula.FilterAdditional == true
+    - file.ext.containsAny("md", "canvas")
+formulas:
+  Thumbnail: |-
+    [[
+
+    formula.Variables
+
+    ]].map([
+
+    if(
+    file
+    .properties[value[0][0][13]]
+    .isType("Link"),
+    image(
+    file
+    .properties[value[0][0][13]]
+    )
+    ,
+    file
+    .properties[value[0][0][13]])
+
+    ])[0][0]
+  Note: link(file, "See note")
+  Open: |-
+    [[
+
+    formula.Variables
+
+    ]].map([
+
+    if(
+    !file
+    .properties[value[0][0][15]]
+    .isEmpty(),
+
+    link(
+    list(
+    file
+    .properties[value[0][0][15]]
+    )[0],
+    "🚀"
+    + file.basename
+    )
+
+    ,if(
+    !file
+    .properties[value[0][0][14]]
+    .isEmpty(),
+
+    link(
+    list(
+    file
+    .properties[value[0][0][14]]
+    )[0],
+    "🌐"
+    + file.basename
+    )
+
+    ))
+
+    ])[0][0]
+  FilterAdditional: |-
+    !(
+
+    [[
+    this.file
+    .properties["Filter"][0]
+    ]].map([
+    if(
+    value[0] == "Manual",
+    this.file
+    .properties["Filter"]
+    ,
+    this.file
+    .properties["Collections"]
+    )
+    ]).map([
+    if(
+    value[0]
+    .contains("Hidden"),
+    (0).isTruthy()
+    ,Privacy
+    .containsAny("Hidden")
+    )
+    ])[0][0]
+
+    ||
+
+    (0)
+    )
+  Random: random()
+  Variables: |+
+    [[
+
+    file("Xenocryst config v2")
+    .properties
+
+    ]].map([
+
+    [
+    value[0].keys(),
+    value[0].values()
+    ]
+
+    ])[0][0]
+
+
+  FilterThing: |-
+    [[
+
+    formula.Variables
+
+    ]].map(
+
+    if(
+    this.file
+    .properties[value[0][0][1]]
+    .isEmpty(),
+
+    [ 
+    "Dud variables slot",
+    list(
+    file
+    .properties[value[0][0][0]]
+    ).contains(
+    link(this.file.basename)
+    .toString()
+    )
+    ]
+
+
+    ,
+
+    [[
+
+    formula.Variables2
+
+    ]].map([ value[0],
+
+    if(
+    this.file
+    .properties[value[0][0][2]][0]
+    == "Manual",
+
+    [
+    [],
+    [
+    value[0][3].filter(!(index==0)),
+    file.properties[value[0][4]]
+    ]
+    ]
+
+    , 
+     
+    [
+    [
+    value[0][2],
+    file.properties[value[0][4]]
+    ],
+    [
+    value[0][3],
+    file
+    .properties[value[0][0][0]]
+    ]
+    ]
+    )
+
+    ]).map([ value[0],
+
+    value[1].map(
+    [
+    value
+    ].map(
+    list(value[0])
+    .reduce(
+
+    [acc[0] + 
+    [[value, acc[1]]]
+    ,acc[1]],
+
+    [[], value[1]]
+    )[0]
+    )
+    )
+
+    ]).map([ value[0],
+
+    ["Comment: Contains operations",
+
+    value[1].map(
+    value.map(
+    value.map(
+    if(
+    value[1] == null,
+    false,
+    value[1].contains(value[0])
+    )
+    )
+    )
+    )
+
+    ,value[1] ][1]
+
+
+    ]).map([ value[0],
+
+    ["Comment: AND/OR matching mode",
+
+    if(
+    "OR" && false,
+    list(value[1][0].flat())
+    .contains(true)
+    ,if(
+    "AND" && true,
+    !list(value[1][0].flat())
+    .contains(false)
+    ))
+    && 
+    if(
+    value[1][1] == null,
+    true,
+    list(value[1][1].flat())
+    .contains(true)
+    )
+
+    ,value[1] ][1]
+
+
+    ])[0]
+
+    )
+
+    )[0][1]
+  Variables2: |-
+    [[
+
+    formula.Variables
+
+    ]].map([
+
+    value[0]
+
+    +
+
+    [
+    this.file
+    .properties[value[0][0][0]],
+    this.file
+    .properties[value[0][0][2]]
+    ].map(
+    if(
+    value == ["true"], 
+    [true]
+    ,if(
+    value == ["false"], 
+    [false]
+    ,
+    value
+    ))
+    )
+
+    +
+
+    [
+    this.file
+    .properties[value[0][0][1]]
+    ]
+
+    ])[0][0]
+  Age: |
+    
+    [[
+
+    [[
+    this.file
+    .properties["Reference"],
+    Origin
+    ]].map(
+
+    if(
+    value[0]>value[1],
+    [value[0],value[1],""]
+    ,if(
+    value[1]>value[0],
+    [value[1],value[0],"- "]
+    ,if(
+    value[0]==value[1],
+    [null,null,"Today!"]
+    )))
+
+    )[0]
+
+
+    ]].map([ value[0],
+
+    [
+    duration(
+    (value[0][0]
+    -value[0][1])
+    .years.floor()+"y"
+    )
+    ]
+
+    ]).map([ value[0],
+
+    value[1]
+    +
+    [
+    duration(
+    (value[0][0]-
+    (value[0][1]
+    +value[1][0])
+    ).months.floor()+"M"
+    )
+    ]
+
+    ]).map([ value[0],
+
+    value[1]
+    +
+    [
+    duration(
+    (value[0][0]-
+    (value[0][1]
+    +value[1][0]
+    +value[1][1])
+    ).days.floor()+"d"
+    )
+    ]
+
+    ]).map(
+
+    value[0][2]
+    +
+
+    if(
+    ![
+    value[0][0].isType("date"),
+    value[0][1].isType("date")
+    ].contains(false),
+
+
+    [
+    if(
+    value[1][0].years!=0,
+    value[1][0].years+" years"
+    )
+    ,
+    if(
+    value[1][1].months!=0,
+    value[1][1].months+" months"
+    )
+    ,
+    if(
+    value[1][2].days!=0,
+    value[1][2].days+" days"
+    )
+    ].filter(
+    value!=null
+    ).join(", ")
+
+    )
+
+    )[0]
+  Backlinks: |-
+    file.backlinks
+    .filter(
+    value.asFile()
+    .properties["Discusses"]
+    .contains(
+    file.name
+    )
+    ||
+    value.asFile()
+    .properties["Collections"]
+    .contains(
+    file.name
+    )
+    )
+    .length
+  Relevance: |+
+    (
+
+
+    ( 1 + 
+    if(QuickResume,0.5,0) +
+    if(Time,Time,0)
+    /
+    (if(Time,Time.abs(),0) +30)
+    )
+
+    *
+
+    ( 1 +
+    if(Money,Money.abs(),0)
+    /
+    (if(Money,Money.abs(),0) +20)
+    )
+
+    *
+
+    ( 
+    formula.Backlinks
+    /
+    (formula.Backlinks.abs() +10)
+    )
+
+    )
+
+  AutofillCollection: |-
+    if(
+    this.file
+    .properties["Query"]
+    .isEmpty(),
+    link(this.file.basename)
+    .toString()
+
+    ,if(
+    this.file
+    .properties["Query"],
+    list(
+    this.file
+    .properties["Filter"]
+    )[0]
+
+    ))
+  DateMain: |-
+    ["Comment: Picks one of the dates among the filled out date properties by order of relevance / priority. That is to say, from most relevant to least relevant: Expiry > Origin > Engaged > Concluded.",
+
+    [
+
+    formula.Variables
+
+    ].map(
+
+    if(
+    !file.properties[value[0][6]]
+    .isEmpty(),
+    file.properties[value[0][6]]
+    ,if(
+    !file.properties[value[0][5]]
+    .isEmpty(),
+    file.properties[value[0][5]]
+    ,if(
+    !file.properties[value[0][3]]
+    .isEmpty(),
+    file.properties[value[0][3]]
+    ,if(
+    !file.properties[value[0][4]]
+    .isEmpty(),
+    file.properties[value[0][4]]
+    ))))
+    .format("YYYY-MM-DD")
+
+
+    )[0]
+
+    ][1]
+  DateRelative: |-
+    ["Comment: anniversaries for entities are treated like other upcoming events, and relative date counts down to the next anniversary. However, anniversaries for non-entities are only shown on the very day of the anniversary, so instead of a useless countdown, the relative date instead shows the age of the thing.",
+
+
+    [
+
+    formula.Variables
+
+    ].map(
+
+    date(
+    if(
+    file
+    .properties[value[0][0]]
+    .contains(
+    link(value[1][2][0])
+    ), 
+    formula.DateMain,
+    formula.DateMain
+    )
+    )
+    - today()
+
+
+    )[0]
+
+    ][1]
+  DateAnniversaries: |-
+    if(
+    "Comment: if main date is already in the past, replace with anniversary date if possible.",
+
+    [
+
+    formula.Variables
+
+    ].map(
+
+    if(
+    date(formula.DateMain)
+    < today()
+    &&
+    !file
+    .properties[value[0][5]]
+    .isEmpty(),
+
+    [
+    file
+    .properties[value[0][5]]
+    ].map(
+    today().year
+    + value.format("-MM-DD")
+    )[0]
+
+    ,formula.DateMain
+    )
+
+    )[0]
+
+    )
+properties:
+  note.Attraction:
+    displayName: 📊
+  note.Favourite:
+    displayName: ⭐
+  formula.Thumbnail:
+    displayName: 🖼️
+  note.Serial:
+    displayName: 🔢
+  note.QuickResume:
+    displayName: 🧲
+  formula.Backlinks:
+    displayName: 🔗
+views:
+  - type: table
+    name: Default
+    order:
+      - formula.Thumbnail
+      - file.name
+      - aliases
+    sort:
+      - property: Sequence
+        direction: ASC
+      - property: Query
+        direction: ASC
+      - property: Distinction
+        direction: ASC
+    separator: ", "
+    markers: number
+    nestedProperties: false
+    columnSize:
+      formula.Thumbnail: 32
+      file.name: 329
+      note.Collections: 488
+      note.aliases: 573
+  - type: table
+    name: Table (ranked)
+    groupBy:
+      property: Attraction
+      direction: DESC
+    order:
+      - formula.Backlinks
+      - QuickResume
+      - formula.Thumbnail
+      - file.name
+      - aliases
+    sort:
+      - property: formula.Relevance
+        direction: DESC
+    separator: ", "
+    markers: number
+    nestedProperties: false
+    columnSize:
+      formula.Backlinks: 2
+      note.QuickResume: 20
+      formula.Thumbnail: 32
+      file.name: 329
+      note.aliases: 573
+  - type: map
+    name: ---------- Versatile ----------
+  - type: cards
+    name: Tile, textless (by date)
+    order: []
+    sort:
+      - property: formula.DateMain
+        direction: DESC
+      - property: Ideated
+        direction: ASC
+    image: formula.Thumbnail
+    cardSize: 160
+    imageFit: contain
+  - type: cards
+    name: Tile, launcher (ranked)
+    order:
+      - file.name
+      - formula.Open
+    sort:
+      - property: formula.Relevance
+        direction: DESC
+    columnSize:
+      note.Favourite: 32
+      note.Attraction: 8
+      formula.Thumbnail: 70
+      file.name: 206
+    image: note.Thumbnail
+    cardSize: 110
+    imageFit: contain
+    imageAspectRatio: 0.9
+  - type: cards
+    name: Tile, launcher (categorized)
+    groupBy:
+      property: Collections
+      direction: ASC
+    order:
+      - file.name
+      - formula.Open
+    imageFit: contain
+    image: note.Thumbnail
+    cardSize: 130
+  - type: cards
+    name: Posters (special sorting)
+    groupBy:
+      property: Structure
+      direction: ASC
+    sort:
+      - property: formula.Relevance
+        direction: DESC
+      - property: Quest
+        direction: DESC
+      - property: formula.MainDate
+        direction: DESC
+    image: formula.Thumbnail
+    imageFit: contain
+    imageAspectRatio: 1.5
+    cardSize: 120
+  - type: cards
+    name: Posters, date (by date)
+    order:
+      - file.name
+      - Origin
+    sort:
+      - property: Origin
+        direction: DESC
+    columnSize:
+      note.Favourite: 32
+      note.Attraction: 8
+      formula.Thumbnail: 70
+      file.name: 206
+    image: note.Thumbnail
+    cardSize: 160
+    imageFit: contain
+    imageAspectRatio: 1.35
+  - type: cards
+    name: Posters, authors, launcher (ranked)
+    groupBy:
+      property: Attraction
+      direction: ASC
+    order:
+      - file.name
+      - Contributors
+      - formula.Open
+    sort:
+      - property: formula.Relevance
+        direction: DESC
+    columnSize:
+      note.Favourite: 32
+      note.Attraction: 8
+      formula.Thumbnail: 70
+      file.name: 206
+    image: note.Thumbnail
+    cardSize: 200
+    imageFit: contain
+    imageAspectRatio: 1.35
+  - type: cards
+    name: Banners, textless (by date)
+    order: []
+    sort:
+      - property: formula.DateMain
+        direction: DESC
+    image: formula.Thumbnail
+    imageAspectRatio: 0.5
+    imageFit: contain
+    cardSize: 150
+  - type: cards
+    name: Banners, date (by date)
+    order:
+      - file.name
+      - Origin
+    sort:
+      - property: formula.DateMain
+        direction: DESC
+    image: formula.Thumbnail
+    imageAspectRatio: 0.5
+    imageFit: contain
+    cardSize: 150
+  - type: cards
+    name: Title only grid (by name)
+    groupBy:
+      property: Attraction
+      direction: DESC
+    order:
+      - file.name
+    sort: []
+    separator: ", "
+    markers: number
+    nestedProperties: false
+    columnSize:
+      note.Attraction: 4
+      note.Favourite: 9
+      file.name: 206
+      note.aliases: 618
+    cardSize: 160
+  - type: list
+    name: List (ordered)
+    order:
+      - Serial
+      - file.name
+      - Specifications
+    sort:
+      - property: Serial
+        direction: ASC
+  - type: list
+    name: List (ranked)
+    groupBy:
+      property: Attraction
+      direction: DESC
+    order:
+      - file.name
+      - formula.Backlinks
+    sort:
+      - property: formula.Relevance
+        direction: DESC
+      - property: QuickResume
+        direction: DESC
+      - property: Attraction
+        direction: ASC
+    separator: ", "
+    markers: bullet
+    nestedProperties: false
+    columnSize:
+      file.name: 624
+    cardSize: 340
+  - type: list
+    name: List (by date)
+    order:
+      - file.name
+      - formula.MainDate
+    sort:
+      - property: Engaged
+        direction: DESC
+  - type: map
+    name: ---------- Specific ----------
+  - type: table
+    name: Entities
+    order:
+      - QuickResume
+      - formula.Thumbnail
+      - file.name
+      - Markers
+      - External
+      - Origin
+      - Privacy
+      - formula.Backlinks
+      - Attraction
+    sort:
+      - property: formula.Relevance
+        direction: DESC
+      - property: file.name
+        direction: ASC
+    summaries:
+      Privacy: Empty
+      Focus: Empty
+      Markers: Empty
+    columnSize:
+      note.Attraction: -36
+      formula.Thumbnail: -15
+      file.name: 206
+      note.Specialty: 166
+      note.External: 126
+      formula.Relevance: 169
+      formula.Backlinks: 48
