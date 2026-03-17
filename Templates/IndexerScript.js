@@ -30,7 +30,7 @@ class IndexerScript {
     // Index update logic (uses this.app directly)
     const indexFilename = 'Index.md';
     const allFiles = this.app.vault.getMarkdownFiles();
-    const indexFile = allFiles.find(f => f.path.endsWith(indexFilename));
+    const indexFile = allFiles.find(f => f.name === indexFilename);
     if (!indexFile) return;
 
     // Optimized filter with a for loop (no callback overhead)
