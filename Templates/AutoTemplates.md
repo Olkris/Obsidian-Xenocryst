@@ -1,4 +1,14 @@
 <%*
+// Give Obsidian a tiny fraction of a second to register plugin-inserted text
+await new Promise(r => setTimeout(r, 50)); 
+
+const content = await tp.file.content;
+
+// If the file already has text (inserted by your Base/Button), stop the script!
+if (content.length > 0) {
+    return; 
+}
+
 const title = tp.file.title;
 const isUntitled = title.startsWith("Untitled");
 
@@ -12,6 +22,3 @@ if (isUntitled) {
     tR += await tp.file.include(templateB);
 }
 %>
-
-
-
