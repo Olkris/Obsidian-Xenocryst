@@ -355,7 +355,8 @@ formulas:
     value[1]>value[0],
     [value[1],value[0],"- "]
     ,if(
-    value[0]==value[1],
+    value[0]==value[1]
+    && value[0] != null,
     [null,null,"Today!"]
     )))
 
@@ -734,7 +735,28 @@ views:
       - property: formula.DateMain
         direction: DESC
       - property: Ideated
-        direction: ASC
+        direction: DESC
+      - property: file.ctime
+        direction: DESC
+    image: formula.Thumbnail
+    cardSize: 160
+    imageFit: contain
+  - type: cards
+    name: Tile, textless (ranked)
+    order: []
+    sort:
+      - property: formula.Relevance
+        direction: DESC
+    image: formula.Thumbnail
+    cardSize: 160
+    imageFit: contain
+  - type: cards
+    name: Tile (ranked)
+    order:
+      - file.name
+    sort:
+      - property: formula.Relevance
+        direction: DESC
     image: formula.Thumbnail
     cardSize: 160
     imageFit: contain
@@ -776,7 +798,7 @@ views:
         direction: DESC
       - property: Quest
         direction: DESC
-      - property: formula.MainDate
+      - property: formula.DateMain
         direction: DESC
     image: formula.Thumbnail
     imageFit: contain

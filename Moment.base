@@ -2,8 +2,18 @@ filters:
   and:
     - file.ext.containsAny("md", "canvas")
     - |-
-      !file.path.startsWith(
-      file("Thing.base").folder
+      !(
+
+      file.path.startsWith(
+      file("Xenocryst config v2").folder
+      )
+
+      ||
+
+      file.path.startsWith(
+      file("✍️Moment").folder
+      )
+
       )
     - Reality != "Fictional"
 formulas:
