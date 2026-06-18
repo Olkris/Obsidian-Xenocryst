@@ -2,8 +2,10 @@
 # Moments
 ![[Moment.base]]
 
-> [!fail]+ Missed notes created on this calendar date
+Slept well? Change the [[Today|symbolic date]]!
+
+> [!fail]+ Missed notes created on this specific calendar date
 > ![[Moment.base#🔚 Missed notes]]
-> See [[Root]] for the full list of missed notes.
+> ![[Full list of missed notes]]
 
 

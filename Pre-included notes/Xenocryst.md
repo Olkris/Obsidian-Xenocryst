@@ -10,21 +10,26 @@ Contributors:
 Collections:
   - "[[Obsidian bases]]"
   - "[[Obsidian]]"
-  - "[[Systems]]"
+  - "[[List of systems]]"
 permalink: Xenocryst
 External:
   - https://github.com/Olkris/Obsidian-Xenocryst.git
   - https://olkris.party/Xenocryst
-Thumbnail:
+Thumbnail: "[[Xenocryst branding draft.png]]"
+Markers:
+  - "[[Personal Knowledge Management|PKM]]"
 ---
 
 # Definition
 Xenocryst is a style of organization for Obsidian vaults, coined by [[Olkris]].
 You may browse the notes linked below to inform yourself on what the intended usage looks like, and what features are available.
 Pay notice as you navigate: these notes are already organized with Xenocryst, get a feel for it.
+
+Here's our mascot btw :
+![[59efce7e-71e2-4e0b-914b-05558b154182 (1) 2.png]]
+
 # Redirects
-[[Xenocryst configuration]] (deprecated)
-[[Xenocryst config v2]]
+[[Personal Knowledge Management]]
 # Things
 ![[Xenocryst bundle/Thing.base]]
 
@@ -48,3 +53,4 @@ The rememberable points aren't layed out the same as the story to best warm up t
 
 Stay in the topic navigation mesh with topics base
 Then find an exit point / your destination with the time base.
+

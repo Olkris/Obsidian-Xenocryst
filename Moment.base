@@ -5,6 +5,7 @@ filters:
       !file.path.startsWith(
       file("Thing.base").folder
       )
+    - Reality != "Fictional"
 formulas:
   FilterUpcoming: |-
     ["Comment: Returns true for things that have any of their dates happening in the future. For Origin and Expiry, also returns true if on the same day, while for Engaged and Concluded it doesn't, since otherwise the table would get flooded with today's events every single time and become useless.",
@@ -91,6 +92,7 @@ formulas:
 
     ].map(
 
+    date(
     if(
     !file.properties[value[0][6]]
     .isEmpty(),
@@ -108,6 +110,7 @@ formulas:
     .isEmpty(),
     file.properties[value[0][4]]
     ))))
+    )
     .format("YYYY-MM-DD")
 
 
@@ -124,12 +127,19 @@ formulas:
 
     ].map(
 
+    [
+    value[0]
+    ]
+    +
+
+    [
+
     date(
     if(
     file
-    .properties[value[0][0]]
+    .properties[value[0][0][0]]
     .contains(
-    link(value[1][2][0])
+    link(value[0][1][2][0])
     ), 
     formula.DateAnniversaries,
     formula.DateMain
@@ -137,13 +147,15 @@ formulas:
     )
     - today()
 
+    ]
+
     ).map(
 
     if(
-    value.toString()
+    value[1].toString() 
     == "a few seconds",
     "TODAY!",
-    value
+    value[1]
     )
 
     )[0]
@@ -321,7 +333,7 @@ formulas:
 
     )
   Checkbox: |
-    
+    !
     [[
 
     formula.Variables
@@ -666,7 +678,7 @@ properties:
   note.Money:
     displayName: 💵
   formula.Checkbox:
-    displayName: ✅
+    displayName: 🤔
   formula.Thumbnail:
     displayName: 🖼️
   note.Attraction:
@@ -719,8 +731,9 @@ views:
   - type: table
     name: 🔜 Upcoming + anniversaries
     filters:
-      or:
+      and:
         - formula.FilterUpcoming == true
+        - Shelved.isEmpty()
     order:
       - formula.Thumbnail
       - file.name
@@ -787,7 +800,7 @@ views:
     sort:
       - property: formula.Relevance
         direction: DESC
-    limit: 100
+    limit: 90
     columnSize:
       formula.Thumbnail: 51
       file.name: 310
@@ -815,7 +828,7 @@ views:
                   .matches(file.basename)
                 - and:
                     - and:
-                        - and:
+                        - or:
                             - Discusses.isEmpty()
                             - Engaged.isEmpty()
                         - and:
