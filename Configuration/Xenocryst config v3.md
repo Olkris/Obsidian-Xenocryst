@@ -2,15 +2,17 @@
 Collections:
   - "[[Years]]"
   - "[[Index]]"
-Query:
+  - "[[Today]]"
+  - "[[DebugOption]]"
+Query: Markers
 Filter:
-  - "[[Known entities]]"
   - Manual
+  - "[[Known entities]]"
 Engaged: 1111-11-11
 Disengaged: 1111-11-11
 Origin: 1111-11-11
 Expiry: 1111-11-11
-Ideated: 2026-02-17
+Ideated: 1111-11-11
 Shelved: 1111-11-11
 Discusses:
   - "20"
@@ -25,9 +27,34 @@ External:
 Shortcuts:
   - .
   - .
+Directory:
+  - Lists
+  - List of *
+  - "* list"
 ---
 # Things
 ![[Xenocryst bundle/Thing.base]]
 
 # Moments
 ![[Moment.base]]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
