@@ -4,7 +4,10 @@ Collections:
 aliases:
   - Xenocryst updates
   - Xenocryst versions
-Sequence: 8
+  - Xenocryst devlogs
+  - Xenocryst packaged releases
+  - Xenocryst milestones
+  - Xenocryst development
 Thumbnail: 📥
 ---
 

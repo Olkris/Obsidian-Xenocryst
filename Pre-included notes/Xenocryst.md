@@ -11,11 +11,12 @@ Collections:
   - "[[Obsidian bases]]"
   - "[[Obsidian]]"
   - "[[List of systems]]"
+  - "[[Workflows ARCHA should be capable of|ARCHA workflow wishlist]]"
 permalink: Xenocryst
 External:
   - https://github.com/Olkris/Obsidian-Xenocryst.git
   - https://olkris.party/Xenocryst
-Thumbnail: "[[Xenocryst branding draft.png]]"
+Thumbnail: "[[Xeno crytter.png]]"
 Markers:
   - "[[Personal Knowledge Management|PKM]]"
 ---
@@ -26,7 +27,7 @@ You may browse the notes linked below to inform yourself on what the intended us
 Pay notice as you navigate: these notes are already organized with Xenocryst, get a feel for it.
 
 Here's our mascot btw :
-![[59efce7e-71e2-4e0b-914b-05558b154182 (1) 2.png]]
+![[Xeno crytter.png]]
 
 # Redirects
 [[Personal Knowledge Management]]

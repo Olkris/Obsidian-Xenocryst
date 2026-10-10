@@ -1,11 +1,13 @@
 ---
 Collections:
-  - "[[Xenocryst updates]]"
+  - "[[Xenocryst primer]]"
 aliases:
-  - Xenocryst 6.06a
+  - Xenocryst first setup
+  - Xenocryst initial setup steps
 ---
 # Things
 ![[Xenocryst bundle/Thing.base]]
 
 # Moments
 ![[Moment.base]]
+

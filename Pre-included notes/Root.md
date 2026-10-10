@@ -3,7 +3,6 @@ aliases:
   - Dashboard
   - Cockpit
   - Root
-  - Overview panel
   - Homepage
   - Widgets
 ---
@@ -15,6 +14,7 @@ aliases:
 > ![[Moment.base]]
 
 > [!question] Upcoming + anniversaries
+> Remember to add expiry dates for important things
 > 
 > ![[Moment.base#🔜 Upcoming + anniversaries]]
 
