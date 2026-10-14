@@ -20,13 +20,13 @@ Discusses:
 Money: 60
 Time: 40
 QuickResume: false
-Thumbnail:
+Thumbnail: "[[Xeno crytter.png]]"
 External:
   - https://olkris.party/Xenocryst
   - https://github.com/Olkris/Obsidian-Xenocryst.git
 Shortcuts:
-  - .
-  - .
+  - obsidian://open?file=Xenocryst
+  - android-app://md.obsidian
 Directory:
   - Lists
   - List of *

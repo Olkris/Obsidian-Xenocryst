@@ -57,6 +57,7 @@ filters:
               this.file
               .properties["Collections"]
               )
+            - formula.FilterThing == true
         - and:
             - |-
               this.file
@@ -68,68 +69,63 @@ filters:
               ).contains(
               formula.AutofillCollection
               )
+            - formula.FilterThing == true
+        - |-
+          if(
+          formula.£DebugOptions
+          .contains(
+          "ExtraDebugResults"
+          )
+          ,
+
+          file == formula.¥XenocrystConfig
+
+          )
     - formula.FilterAdditional == true
     - file.ext.containsAny("md", "canvas")
 formulas:
   Thumbnail: |-
-    [[
+    [0].map([
 
-    formula.Variables
+    file
+    .properties[formula._tmb]
 
-    ]].map([
+    ]).map([
 
     if(
-    file
-    .properties[value[0][0][13]]
-    .isType("Link"),
-    image(
-    file
-    .properties[value[0][0][13]]
-    )
+    value[0].isType("Link")
     ,
-    file
-    .properties[value[0][0][13]])
 
-    ])[0][0]
+    image(value[0])
+
+    ,
+    value[0]
+    )
+
+    ])[0]
   Note: link(file, "See note")
   Open: |-
-    [[
-
-    formula.Variables
-
-    ]].map([
-
     if(
-    !file
-    .properties[value[0][0][15]]
-    .isEmpty(),
+    !formula.$that_opn
+    .isEmpty()
+    ,
 
     link(
-    list(
-    file
-    .properties[value[0][0][15]]
-    )[0],
-    "🚀"
-    + file.basename
+    list(formula.$that_opn)[0],
+    "🚀" + file.basename
     )
 
     ,if(
-    !file
-    .properties[value[0][0][14]]
-    .isEmpty(),
+    !formula.$that_xtr
+    .isEmpty()
+    ,
 
     link(
-    list(
-    file
-    .properties[value[0][0][14]]
-    )[0],
-    "🌐"
-    + file.basename
+    list(formula.$that_xtr)[0],
+    "🌐" + file.basename
     )
 
     ))
-
-    ])[0][0]
   FilterAdditional: |-
     !(
 
@@ -160,184 +156,21 @@ formulas:
     (0)
     )
   Random: random()
-  Variables: |+
-    [[
-
-    file("Xenocryst config v2")
-    .properties
-
-    ]].map([
-
-    [
-    value[0].keys(),
-    value[0].values()
-    ]
-
-    ])[0][0]
-
-
   FilterThing: |-
-    [[
+    formula.€FilterTypeFolders
 
-    formula.Variables
-
-    ]].map(
+    &&
 
     if(
-    this.file
-    .properties[value[0][0][1]]
-    .isEmpty(),
-
-    [ 
-    "Dud variables slot",
-    list(
-    file
-    .properties[value[0][0][0]]
-    ).contains(
-    link(this.file.basename)
-    .toString()
-    )
-    ]
-
-
+    formula.$this_qry
+    .isEmpty()
     ,
 
-    [[
+    formula.€FilterReverseLink
 
-    formula.Variables2
-
-    ]].map([ value[0],
-
-    if(
-    this.file
-    .properties[value[0][0][2]][0]
-    == "Manual",
-
-    [
-    [],
-    [
-    value[0][3].filter(!(index==0)),
-    file.properties[value[0][4]]
-    ]
-    ]
-
-    , 
-     
-    [
-    [
-    value[0][2],
-    file.properties[value[0][4]]
-    ],
-    [
-    value[0][3],
-    file
-    .properties[value[0][0][0]]
-    ]
-    ]
-    )
-
-    ]).map([ value[0],
-
-    value[1].map(
-    [
-    value
-    ].map(
-    list(value[0])
-    .reduce(
-
-    [acc[0] + 
-    [[value, acc[1]]]
-    ,acc[1]],
-
-    [[], value[1]]
-    )[0]
-    )
-    )
-
-    ]).map([ value[0],
-
-    ["Comment: Contains operations",
-
-    value[1].map(
-    value.map(
-    value.map(
-    if(
-    value[1] == null,
-    false,
-    value[1].contains(value[0])
-    )
-    )
-    )
-    )
-
-    ,value[1] ][1]
-
-
-    ]).map([ value[0],
-
-    ["Comment: AND/OR matching mode",
-
-    if(
-    "OR" && false,
-    list(value[1][0].flat())
-    .contains(true)
-    ,if(
-    "AND" && true,
-    !list(value[1][0].flat())
-    .contains(false)
-    ))
-    && 
-    if(
-    value[1][1] == null,
-    true,
-    list(value[1][1].flat())
-    .contains(true)
-    )
-
-    ,value[1] ][1]
-
-
-    ])[0]
-
-    )
-
-    )[0][1]
-  Variables2: |-
-    [[
-
-    formula.Variables
-
-    ]].map([
-
-    value[0]
-
-    +
-
-    [
-    this.file
-    .properties[value[0][0][0]],
-    this.file
-    .properties[value[0][0][2]]
-    ].map(
-    if(
-    value == ["true"], 
-    [true]
-    ,if(
-    value == ["false"], 
-    [false]
     ,
-    value
-    ))
+    formula.€FilterCrossmatch
     )
-
-    +
-
-    [
-    this.file
-    .properties[value[0][0][1]]
-    ]
-
-    ])[0][0]
   Age: |
     
     [[
@@ -497,37 +330,46 @@ formulas:
 
     ))
   DateMain: |-
-    ["Comment: Picks one of the dates among the filled out date properties by order of relevance / priority. That is to say, from most relevant to least relevant: Expiry > Origin > Engaged > Concluded.",
+    ["COMMENT: Picks one of the dates among the filled out date properties by order of relevance / priority. That is to say, from most relevant to least relevant: Expiry > Origin > Engaged > Concluded.",
 
-    [
-
-    formula.Variables
-
-    ].map(
 
     if(
-    !file.properties[value[0][6]]
-    .isEmpty(),
-    file.properties[value[0][6]]
+    !file
+    .properties[formula.Xxpr]
+    .isEmpty()
+    ,
+
+    file.properties[formula.Xxpr]
+
     ,if(
-    !file.properties[value[0][5]]
-    .isEmpty(),
-    file.properties[value[0][5]]
+    !file
+    .properties[formula.Xori]
+    .isEmpty()
+    ,
+
+    file.properties[formula.Xori]
+
     ,if(
-    !file.properties[value[0][3]]
-    .isEmpty(),
-    file.properties[value[0][3]]
+    !file
+    .properties[formula.Xeng]
+    .isEmpty()
+    ,
+
+    file.properties[formula.Xeng]
+
     ,if(
-    !file.properties[value[0][4]]
-    .isEmpty(),
-    file.properties[value[0][4]]
+    !file
+    .properties[formula.Xdng]
+    .isEmpty()
+    ,
+
+    file.properties[formula.Xdng]
+
     ))))
     .format("YYYY-MM-DD")
 
 
-    )[0]
-
-    ][1]
+    ,"END COMMENT"][1]
   DateRelative: |-
     ["Comment: anniversaries for entities are treated like other upcoming events, and relative date counts down to the next anniversary. However, anniversaries for non-entities are only shown on the very day of the anniversary, so instead of a useless countdown, the relative date instead shows the age of the thing.",
 
@@ -628,6 +470,376 @@ formulas:
     )[0]
 
     ).round(2)
+  £DebugOptions: |-
+    list(
+    formula.¥DebugFile
+    .properties
+    .values()[0]
+    )
+  £PropertyNames: |-
+    formula.¥XenocrystConfig
+    .properties
+    .keys()
+  ¥XenocrystConfig: file("Xenocryst config v3")
+  _col: formula.£PropertyNames[0]
+  _qry: formula.£PropertyNames[1]
+  _dsc: formula.£PropertyNames[9]
+  _eng: formula.£PropertyNames[3]
+  _tmb: formula.£PropertyNames[13]
+  _xpr: formula.£PropertyNames[6]
+  _ori: formula.£PropertyNames[5]
+  _dng: formula.£PropertyNames[4]
+  _flt: formula.£PropertyNames[2]
+  _dir: formula.£PropertyNames[16]
+  _shl: formula.£PropertyNames[8]
+  £UnitTests: |-
+    if(
+    formula.£UTPropertyNames != true
+    ,
+
+    formula.£UTPropertyNames
+
+    ,
+    true
+    )
+  £UTPropertyNames: |-
+    !formula.£DebugOptions
+    .contains(
+    "EnforceDefaultPropertyNames"
+    )
+
+    ||
+
+    if(
+    formula._col != "Collections"
+    ,
+
+    "_col != Collections"
+
+    ,if(
+    formula._dsc != "Discusses"
+    ,
+
+    "_dsc != Discusses"
+
+    ,if(
+    formula._eng != "Engaged"
+    ,
+
+    "_eng != Engaged"
+
+    ,if(
+    formula._dng != "Disengaged"
+    ,
+
+    "_dng != Disengaged"
+
+    ,if(
+    formula._ori != "Origin"
+    ,
+
+    "_ori != Origin"
+
+    ,if(
+    formula._xpr != "Expiry"
+    ,
+
+    "_xpr != Expiry"
+
+    ,if(
+    formula._shl != "Shelved"
+    ,
+
+    "_shl != Shelved"
+
+    ,if(
+    formula._tmb != "Thumbnail"
+    ,
+
+    "_tmb != Thumbnail"
+
+    ,if(
+    formula._xtr != "External"
+    ,
+
+    "_xtr != External"
+
+    ,if(
+    formula._opn != "Shortcuts"
+    ,
+
+    "_opn != Shortcuts"
+
+    ,
+    true
+    ))))))))))
+  $$TypeFolders: |-
+    if(
+    !formula.$this_dir
+    .isEmpty()
+    ,
+
+    formula.$this_dir
+    .map(
+    [formula.£TypeFoldersRoot,
+    value]
+    .join("/")
+    )
+
+    )
+  £TypeFoldersRoot: |-
+    formula.¥XenocrystConfig
+    .properties[formula._dir]
+    [0]
+  €FilterTypeFolders: |-
+    if(
+    !formula.$$TypeFolders
+    .isEmpty()
+    &&
+    formula.$$TypeFolders
+    .map(
+    file.inFolder(value)
+    ).contains(true)
+    ,
+
+    true
+
+    ,if(
+    file
+    .inFolder(
+    formula.£TypeFoldersRoot
+    )
+    ,
+
+    false
+
+    ,
+    true
+    ))
+  £SpecialFiles: |-
+    formula.¥XenocrystConfig
+    .properties[formula._col]
+  ¥IndexFile: formula.£SpecialFiles[1]
+  ¥TodayFile: formula.£SpecialFiles[2]
+  ¥YearsFile: formula.£SpecialFiles[0]
+  $this_col: |-
+    [0].map([
+
+    this.file
+    .properties[formula._col]
+
+    ]).map([
+
+    if(
+    value[0] == ["true"], 
+
+    [true]
+
+    ,if(
+    value[0] == ["false"], 
+
+    [false]
+
+    ,
+    value[0]
+    ))
+
+    ])[0][0]
+  $that_col: |-
+    file
+    .properties[formula._col]
+  $this_flt: |-
+    [0].map([
+
+    this.file
+    .properties[formula._flt]
+
+    ]).map([
+
+    if(
+    value[0] == ["true"], 
+
+    [true]
+
+    ,if(
+    value[0] == ["false"], 
+
+    [false]
+
+    ,
+    value[0]
+    ))
+
+    ])[0][0]
+  $this_qry: |-
+    this.file
+    .properties[formula._qry]
+  £ManualKeyword: |-
+    formula.¥XenocrystConfig
+    .properties[formula._flt]
+    [0]
+  $that_qry$$: |-
+    file
+    .properties[
+    formula.$this_qry
+    ]
+  $this_dir: |-
+    if(
+    formula.$this_qry
+    .isEmpty()
+    ,
+
+    list(
+    this.file
+    .properties[formula._dir]
+    )
+
+    ,
+    list(
+    formula.$this_flt
+    ).map(
+    file(value)
+    .properties[formula._dir]
+    )
+    )
+  £SpecialCollections: |-
+    formula.¥XenocrystConfig
+    .properties[formula._flt]
+    .filter(
+    value
+    != formula.£ManualKeyword
+    )
+  ¥EntitiesCollection: |-
+    formula.£SpecialCollections
+    [0]
+  ¥DebugFile: |-
+    file(
+    formula.£SpecialFiles[3]
+    )
+  €FilterReverseLink: |-
+    list(
+    formula.$that_col
+    ).contains(
+    link(this.file.basename)
+    .toString()
+    )
+  €FilterCrossmatch: |-
+    [0].map([
+
+    ["SECTION: Crossmatch or Manual",
+    if("skip" && false, 
+    value[0]
+    , 
+
+    if(
+    formula.$this_flt[0]
+    == formula.£ManualKeyword
+    ,
+
+    [
+    [],
+    [
+    formula.$this_flt
+    .filter(!(index==0)),
+    formula.$this_qry
+    ]
+    ]
+
+    , 
+     
+    [
+    [
+    formula.$this_col,
+    formula.$that_qry$$
+    ],
+    [
+    formula.$this_flt,
+    formula.$that_col
+    ]
+    ]
+    )
+
+    ),"END SECTION"][1]
+
+    ]).map([
+
+    ["SECTION: create Crossmatch matrices, i.e. this_prop * that_prop",
+    if("skip" && false,
+    "Hello"
+    ,
+
+    value[0].map(
+
+    list(value[0]).reduce(
+    [
+    acc[0] + [ [value, acc[1]] ],
+    acc[1]
+    ],
+
+    [
+    [],
+    value[1]
+    ]
+
+    )[0]
+
+    )
+
+    ),"END SECTION"][1]
+
+    ]).map([
+
+    ["SECTION: Contains operations",
+    if("skip" && false, 
+    value[0]
+    , 
+
+    value[0].map(
+    value.map(
+    value[1] != null
+    &&
+    value[1].contains(value[0])
+    )
+    )
+
+    ),"END SECTION"][1]
+
+    ]).map([
+
+    ["SECTION: AND/OR matching mode",
+    if("skip" && false, 
+    value[0]
+    , 
+
+    if("OR" && false,
+    list(value[0][0].flat())
+    .contains(true)
+    ,if("AND" && true,
+    !list(value[0][0].flat())
+    .contains(false)
+    ))
+    && 
+    if(
+    value[0][1] == null,
+    true,
+    list(value[0][1].flat())
+    .contains(true)
+    )
+
+    ),"END SECTION"][1]
+
+    ])[0][0]
+  _xtr: formula.£PropertyNames[14]
+  _opn: formula.£PropertyNames[15]
+  $that_opn: |-
+    file
+    .properties[formula._opn]
+  $that_xtr: |-
+    file
+    .properties[formula._xtr]
+  ¥FolderTemplates: |-
+    file("✍️Moment")
+    .folder
 properties:
   note.Attraction:
     displayName: 📊
@@ -643,6 +855,14 @@ properties:
     displayName: 🔗
   formula.YearlyCost:
     displayName: YearlyCost
+  note.Jitter:
+    displayName: j
+  note.Pressure:
+    displayName: P
+  note.Progression:
+    displayName: p
+  note.Detail:
+    displayName: d
 views:
   - type: table
     name: Table (reorderable)
@@ -793,6 +1013,12 @@ views:
     groupBy:
       property: Structure
       direction: ASC
+    order:
+      - file.name
+      - formula.XCdir
+      - formula.Xdir
+      - formula.XFfolder
+      - formula.XTdir
     sort:
       - property: formula.Relevance
         direction: DESC
@@ -800,7 +1026,7 @@ views:
         direction: DESC
       - property: formula.DateMain
         direction: DESC
-    image: formula.Thumbnail
+    image: note.Thumbnail
     imageFit: contain
     imageAspectRatio: 1.5
     cardSize: 120
@@ -848,7 +1074,7 @@ views:
     sort:
       - property: formula.DateMain
         direction: DESC
-    image: formula.Thumbnail
+    image: note.Thumbnail
     imageAspectRatio: 0.5
     imageFit: contain
     cardSize: 150
@@ -864,6 +1090,22 @@ views:
     imageAspectRatio: 0.5
     imageFit: contain
     cardSize: 150
+  - type: cards
+    name: Mixed format (ranked)
+    order:
+      - file.name
+    sort:
+      - property: formula.Relevance
+        direction: DESC
+      - property: QuickResume
+        direction: DESC
+      - property: formula.Random
+        direction: ASC
+    limit: 12
+    image: note.Thumbnail
+    imageAspectRatio: 0.85
+    cardSize: 140
+    imageFit: contain
   - type: cards
     name: Title only grid (by name)
     groupBy:
@@ -895,6 +1137,9 @@ views:
       - Privacy
       - formula.Backlinks
       - Attraction
+      - formula.$$TypeFolders
+      - formula.FilterThing
+      - formula.€FilterTypeFolders
     sort:
       - property: formula.Relevance
         direction: DESC
@@ -904,14 +1149,16 @@ views:
       Privacy: Empty
       Focus: Empty
       Markers: Empty
+      Origin: Average
+      formula.Thumbnail: Empty
+      file.name: Average
     columnSize:
-      note.Attraction: -36
       formula.Thumbnail: -15
       file.name: 206
-      note.Specialty: 166
       note.External: 126
-      formula.Relevance: 169
       formula.Backlinks: 48
+      note.Attraction: -36
+      formula.$$TypeFolders: 264
   - type: table
     name: Transactions
     order:
@@ -943,3 +1190,55 @@ views:
       file.name: 222
       note.Money: 76
       note.Recurrence: 72
+  - type: table
+    name: Media (by date)
+    order:
+      - formula.Thumbnail
+      - file.name
+      - Origin
+      - Markers
+    sort:
+      - property: Origin
+        direction: DESC
+      - property: formula.Relevance
+        direction: DESC
+      - property: QuickResume
+        direction: DESC
+      - property: Quest
+        direction: DESC
+    separator: ", "
+    markers: number
+    nestedProperties: false
+    columnSize:
+      formula.Thumbnail: 57
+      file.name: 432
+  - type: table
+    name: Media (ranked)
+    groupBy:
+      property: Attraction
+      direction: DESC
+    order:
+      - formula.Thumbnail
+      - file.name
+      - Markers
+      - Platform
+      - Origin
+      - Quest
+    sort:
+      - property: formula.Relevance
+        direction: DESC
+      - property: QuickResume
+        direction: DESC
+      - property: Quest
+        direction: DESC
+      - property: Origin
+        direction: DESC
+      - property: Markers
+        direction: ASC
+    limit: 30
+    columnSize:
+      formula.Thumbnail: 89
+      file.name: 206
+      note.Attraction: 8
+      note.Favourite: 32
+    rowHeight: medium
